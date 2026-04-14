@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSRF PoC - Ancient NeoBrutalism</title>
+  <style>
+    :root {
+      --sand: #efe2c1;
+      --clay: #bf8f5f;
+      --ink: #171513;
+      --sun: #ffbe0b;
+      --scarlet: #d6452d;
+      --stone: #efe7d3;
+      --mint: #79c9a4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 10%, #f8efd8 0 18%, transparent 19%),
+        radial-gradient(circle at 80% 80%, #f1d5a8 0 16%, transparent 17%),
+        linear-gradient(135deg, #e7d2ad, #f4ebd6 55%, #dfc08d);
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    .tablet {
+      width: min(920px, 100%);
+      background: var(--stone);
+      border: 4px solid var(--ink);
+      box-shadow: 12px 12px 0 var(--ink);
+      padding: 28px;
+      position: relative;
+      animation: rise 700ms ease-out;
+    }
+
+    .glyph {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--ink);
+      background: var(--sun);
+      transform: rotate(45deg);
+      top: -20px;
+      right: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 4.5vw, 2.5rem);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1.15;
+    }
+
+    .tag {
+      display: inline-block;
+      border: 3px solid var(--ink);
+      background: var(--mint);
+      font-weight: 800;
+      padding: 6px 10px;
+      margin-bottom: 14px;
+      transform: rotate(-1deg);
+    }
+
+    p {
+      margin: 0 0 16px;
+      font-size: 1rem;
+      line-height: 1.55;
+      max-width: 70ch;
+    }
+
+    .warn {
+      border: 3px dashed var(--scarlet);
+      background: #ffe9e4;
+      padding: 12px;
+      margin-bottom: 18px;
+      font-weight: 700;
+    }
+
+    form {
+      border: 3px solid var(--ink);
+      background: #fffdf7;
+      padding: 16px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      border: 3px solid var(--ink);
+      padding: 12px;
+      background: #fff;
+      font-size: 1rem;
+    }
+
+    button {
+      border: 3px solid var(--ink);
+      background: var(--sun);
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 var(--ink);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    button:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+
+    footer {
+      margin-top: 18px;
+      font-weight: 700;
+      border-top: 3px solid var(--ink);
+      padding-top: 12px;
+    }
+
+    @keyframes rise {
+      from {
+        transform: translateY(20px) scale(0.98);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .tablet {
+        padding: 20px;
+        box-shadow: 8px 8px 0 var(--ink);
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="tablet" role="main">
+    <div class="glyph" aria-hidden="true"></div>
+    <h1>CSRF Demo PoC</h1>
+    <div class="tag">Ancient-NeoBrutalism Edition</div>
+    <p>
+      This lab PoC demonstrates what a forged state-changing request could look like
+      when a target endpoint does not validate anti-CSRF tokens.
+    </p>
+    <div class="warn">
+      Authorized testing only. Use strictly in your own training lab.
+    </div>
+
+    <!--
+      Replace TARGET_URL and field names with values from your intentionally vulnerable lab app.
+      Keep this for ethical and authorized demonstrations only.
+    -->
+    <form id="csrfForm" action="TARGET_URL" method="POST">
+      <div class="row">
+        <label for="field1">Field 1 Name</label>
+        <input id="field1" type="text" name="field1" value="forged_value_1" />
+      </div>
+      <div class="row">
+        <label for="field2">Field 2 Name</label>
+        <input id="field2" type="text" name="field2" value="forged_value_2" />
+      </div>
+      <button type="submit">Trigger Lab Request</button>
+    </form>
+
+    <footer>Built By Benedict ❤</footer>
+  </main>
+</body>
+</html>
