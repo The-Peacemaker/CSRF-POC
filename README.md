@@ -76,17 +76,3 @@ Open `poc.html` and update the placeholders:
 
 This file demonstrates how a forged form post could look in an intentionally vulnerable training environment.
 
-## Step 4: Push to GitHub
-
-```bash
-git init
-git add .
-git commit -m "Add CSRF crawler research and themed PoC"
-git branch -M main
-git remote add origin https://github.com/The-Peacemaker/CSRF-POC
-git push -u origin main
-```
-
-## Submission Hashtag
-
-`#cl-cybersec-crawler`
