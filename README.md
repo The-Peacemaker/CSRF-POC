@@ -66,15 +66,8 @@ Expected output style:
 - `[!] Vulnerable form found ...` (missing CSRF token)
 - `[+] Protected form found ...` (token detected)
 
-## 4) Screenshot-Ready Demo Flow
 
-1. Open vulnerable app at `http://127.0.0.1:5000` and note original username (for example: `Alice`).
-2. Open attacker page `poc.html` in browser (double-click file or serve locally).
-3. Return to the vulnerable app and refresh.
-4. Username is changed to `Mallory (CSRF)`.
-5. This confirms CSRF succeeded because the server accepted a forged cross-site POST while the victim session cookie was active.
-
-## 5) Screenshots Explanation (Before/After)
+## 4) Screenshots Explanation (Before/After)
 
 For submission, capture at least two screenshots:
 
@@ -89,7 +82,7 @@ For submission, capture at least two screenshots:
 Optional third screenshot:
 - Terminal output from `crawler.py` showing `[!] Vulnerable form found ...`
 
-## 6) Conclusion
+## 5) Conclusion
 This project shows that if a web application accepts authenticated state-changing requests without CSRF defenses, an attacker-controlled page can silently trigger unwanted actions. A secure implementation should combine CSRF tokens with browser and request-level checks (SameSite cookies, Origin/Referer checks, and custom headers where appropriate).
 
 ---
