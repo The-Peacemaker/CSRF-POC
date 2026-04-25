@@ -1,78 +1,97 @@
 # CSRF Vulnerability Crawler and Research
 
-This repository contains:
+## Project Overview
+This project demonstrates Cross-Site Request Forgery (CSRF) in a **local vulnerable lab** using:
 
-1. Research notes on CSRF middleware and protections.
-2. A defensive crawler that checks pages for potential CSRF weaknesses.
-3. An Ancient-NeoBrutalism themed HTML PoC page for authorized, lab-only demonstrations.
+- `app.py`: intentionally vulnerable Flask profile dashboard
+- `poc.html`: attacker page that auto-submits a forged request
+- `crawler.py`: CSRF form checker for missing token protections
 
-## Important Legal Notice
+The goal is educational: show how CSRF works, prove impact in a safe environment, and detect weak forms programmatically.
 
-Use this project only on applications you own or have explicit permission to test.
-Do not run security tests on third-party systems without authorization.
+## 1) CSRF Research
 
-## Step 1: CSRF Middleware and Protection Research
+### What is CSRF?
+Cross-Site Request Forgery (CSRF) is a web vulnerability where a victim's browser sends an unwanted, authenticated request to a target site. If the victim is logged in, browser cookies/sessions may be automatically included, and the server can process the forged request as if it were legitimate.
 
-### What CSRF Is
+### How CSRF Tokens Work
+A CSRF token is a secret, unpredictable value tied to a user session (or signed by the server). For every state-changing request (for example `POST`), the server expects this token in the form body or a header.
 
-Cross-Site Request Forgery (CSRF) is an attack where a victim's browser is tricked into making authenticated requests to a target site without the victim's intent.
+Typical validation flow:
+1. Server generates token and sends it to the legitimate page.
+2. Browser submits token with the action request.
+3. Server verifies token correctness and association to the session.
+4. If token is missing/invalid, server rejects the request.
 
-### Why Token Validation Matters
-
-CSRF token validation works by requiring a nonce/token that:
-
-1. Is hard to guess.
-2. Is tied to the user session (or validated cryptographically).
-3. Is validated server-side for state-changing requests.
-
-Without a valid token, the server should reject the request.
+Because attacker pages cannot read protected tokens from the victim site (same-origin policy), forged requests fail when token checks are enforced.
 
 ### Common CSRF Protections
+1. **CSRF tokens** (synchronizer token or double-submit cookie pattern)
+2. **SameSite cookies** (`Lax` or `Strict`) to reduce cross-site cookie sending
+3. **Origin/Referer validation** for state-changing requests
+4. **Custom headers** (for APIs), such as `X-CSRF-Token`, validated server-side
 
-1. Synchronizer token pattern (server stores token in session).
-2. Double-submit cookie pattern (token in cookie and request body/header).
-3. SameSite cookies (`Lax` or `Strict`) to reduce cross-site cookie sending.
-4. Origin/Referer checking for sensitive requests.
-5. Re-authentication or step-up auth for high-risk actions.
+## 2) Project Structure
 
-### Middleware Examples
+```text
+csrf-project/
+ ├── app.py
+ ├── crawler.py
+ ├── poc.html
+ ├── requirements.txt
+ └── README.md
+```
 
-1. Django: `CsrfViewMiddleware`.
-2. Express.js: custom middleware or libraries implementing token checks.
-3. Spring Security: built-in CSRF protection.
-4. Laravel: CSRF middleware with hidden token fields.
+## 3) Setup and Run
 
-## Step 2: CSRF Defensive Crawler
+### Prerequisites
+- Python 3.9+
 
-The crawler looks for:
-
-1. HTML forms using non-GET methods without obvious CSRF token fields.
-2. JavaScript fetch/XHR calls that look state-changing but do not include common CSRF headers.
-
-### Install
-
+### Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### Usage
-
+### Run vulnerable Flask lab
 ```bash
-python crawler.py --url http://localhost:8000 --max-pages 30
+python app.py
 ```
+Open: `http://127.0.0.1:5000`
 
-Optional output to JSON:
-
+### Run crawler
 ```bash
-python crawler.py --url http://localhost:8000 --output findings.json
+python crawler.py http://127.0.0.1:5000
 ```
+Expected output style:
+- `[!] Vulnerable form found ...` (missing CSRF token)
+- `[+] Protected form found ...` (token detected)
 
-## Step 3: HTML PoC (Lab Only)
+## 4) Screenshot-Ready Demo Flow
 
-Open `poc.html` and update the placeholders:
+1. Open vulnerable app at `http://127.0.0.1:5000` and note original username (for example: `Alice`).
+2. Open attacker page `poc.html` in browser (double-click file or serve locally).
+3. Return to the vulnerable app and refresh.
+4. Username is changed to `Mallory (CSRF)`.
+5. This confirms CSRF succeeded because the server accepted a forged cross-site POST while the victim session cookie was active.
 
-1. `TARGET_URL`
-2. Field names and values
+## 5) Screenshots Explanation (Before/After)
 
-This file demonstrates how a forged form post could look in an intentionally vulnerable training environment.
+For submission, capture at least two screenshots:
 
+1. **Before attack**
+   - Dashboard shows original username (`Alice`)
+   - No forged update performed yet
+
+2. **After attack**
+   - After opening `poc.html`, dashboard shows modified username (`Mallory (CSRF)`)
+   - Confirms state change without user intent
+
+Optional third screenshot:
+- Terminal output from `crawler.py` showing `[!] Vulnerable form found ...`
+
+## 6) Conclusion
+This project shows that if a web application accepts authenticated state-changing requests without CSRF defenses, an attacker-controlled page can silently trigger unwanted actions. A secure implementation should combine CSRF tokens with browser and request-level checks (SameSite cookies, Origin/Referer checks, and custom headers where appropriate).
+
+---
+
+**Important:** Use only in an authorized local lab for educational research.
